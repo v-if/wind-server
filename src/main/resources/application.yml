@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: spring boot
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    cache-duration: PT1H
+server:
+  port: 5000
+jwt:
+  token:
+    header: Authorization
+    issuer: tkpark
+    client-secret: Rel3Bjce2MajBo09qgkNgYaTuzvJe8iwnBFhsDS5
+    expiry-seconds: 600
+data-api:
+  service-key: ""
+  ultra-srt-ncst: "http://apis.data.go.kr/1360000/VilageFcstInfoService/getUltraSrtNcst"
+  ultra-srt-fcst: "http://apis.data.go.kr/1360000/VilageFcstInfoService/getUltraSrtFcst"
+  vilage-fcst: "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst"
+  fcst-version: "http://apis.data.go.kr/1360000/VilageFcstInfoService/getFcstVersion"

@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:log4jdbc:mysql://${db-server.db-url}/${db-server.db-database-name}?autoReconnect=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    username: ${db-server.db-username}
+    password: ${db-server.db-password}
+    max-active: 5
+    max-idle: 2
+    min-idle: 1
+    initial-size: 2
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 5
+db-server:
+  db-url: "127.0.0.1:3306"
+  db-username: ""
+  db-password: ""
+  db-database-name: "wind-dev"
+server:
+  port: 5000
+logging:
+  config: classpath:logback-spring-dev.xml
+  level:
+    com.cntt.kiosk.server.LoggingRequestInterceptor: DEBUG
+  file:
+    path: "/home/wind-server/logs"

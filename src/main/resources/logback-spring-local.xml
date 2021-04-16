@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- https://logback.qos.ch/manual/configuration.html -->
+<configuration>
+
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/server.all.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/server.all.log.%d{yyyy-MM-dd}.zip</fileNamePattern>
+            <maxHistory>30</maxHistory> <!-- 일자별 백업파일의 보관기간 -->
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level> <!-- info, warn, error -->
+        </filter>
+        <encoder>
+            <pattern>[ %d{yyyy-MM-dd HH:mm:ss.SSS} ] [%-5level] [%thread] %logger[%method:%line] ==> %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="errfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/server.error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/server.error.log.%d{yyyy-MM-dd}.zip</fileNamePattern>
+            <maxHistory>30</maxHistory> <!-- 일자별 백업파일의 보관기간 -->
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder>
+            <pattern>[ %d{yyyy-MM-dd HH:mm:ss.SSS} ] [%-5level] [%thread] %logger[%method:%line] ==> %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>[ %d{yyyy-MM-dd HH:mm:ss.SSS} ] [%-5level] [%thread] %logger[%method:%line] ==> %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.github.tkpark" level="debug" additivity="false">
+        <appender-ref ref="file" />
+        <appender-ref ref="errfile" />
+        <appender-ref ref="console" />
+    </logger>
+
+    <root level="info">
+        <appender-ref ref="file" />
+        <appender-ref ref="errfile" />
+        <appender-ref ref="console" />
+    </root>
+
+</configuration>
