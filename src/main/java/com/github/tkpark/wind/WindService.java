@@ -57,6 +57,11 @@ public class WindService {
         return windRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
+    public List<RoadPoint> findAllRoadPoint() {
+        return roadPointRepository.findAllByRequestYnOrderByNxAscNyAsc("Y");
+    }
+
     @Transactional
     public String save(String date, String time) {
         log.info("WindService.save(), date:{}, time:{}", date, time);
@@ -123,36 +128,59 @@ public class WindService {
                         if(ny.equals("")) {
                             ny = String.valueOf(item.getNy());
                         }
+
+                        float tempValue = Float.parseFloat(item.getObsrValue());
                         // +900이상, –900 이하 값은 Missing 값으로 처리
                         // 관측장비가 없는 해양 지역이거나 관측장비의 결측 등으로 자료가 없음을 의미
                         switch(item.getCategory()) {
                             case "PTY":
                                 pty = item.getObsrValue();
+                                if(tempValue >= 900.0f || tempValue <= -900.0f) {
+                                    pty = "0";
+                                }
                                 break;
                             case "REH":
                                 reh = item.getObsrValue();
-                                if(Integer.parseInt(reh) >= 900 || Integer.parseInt(reh) <= -900) {
+                                if(tempValue >= 900.0f || tempValue <= -900.0f) {
                                     reh = "0";
                                 }
                                 break;
                             case "RN1":
                                 rn1 = item.getObsrValue();
+                                if(tempValue >= 900.0f || tempValue <= -900.0f) {
+                                    rn1 = "0";
+                                }
                                 break;
                             case "T1H":
                                 t1h = item.getObsrValue();
+                                if(tempValue >= 900.0f || tempValue <= -900.0f) {
+                                    t1h = "0";
+                                }
                                 break;
                             case "UUU":
                                 uuu = item.getObsrValue();
+                                if(tempValue >= 900.0f || tempValue <= -900.0f) {
+                                    uuu = "0";
+                                }
                                 break;
                             case "VEC":
                                 vec = item.getObsrValue();
+                                if(tempValue >= 900.0f || tempValue <= -900.0f) {
+                                    vec = "0";
+                                }
                                 wd16 = calcWindDirection16(vec);
                                 break;
                             case "VVV":
                                 vvv = item.getObsrValue();
+                                if(tempValue >= 900.0f || tempValue <= -900.0f) {
+                                    vvv = "0";
+                                }
                                 break;
                             case "WSD":
                                 wsd = item.getObsrValue();
+                                if(tempValue >= 900.0f || tempValue <= -900.0f) {
+                                    wsd = "0";
+                                }
                                 break;
                         }
                     }

@@ -185,6 +185,7 @@
     </dependencies>
 
     <build>
+        <finalName>wind-server</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

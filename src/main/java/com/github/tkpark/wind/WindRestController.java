@@ -1,6 +1,5 @@
 package com.github.tkpark.wind;
 
-import com.github.tkpark.errors.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,6 +70,48 @@ public class WindRestController {
                 .map(WindDto::new)
                 .collect(toList())
         );
+    }
+
+
+    @GetMapping(path = "data")
+    public ApiResult<WindDataDto> data() {
+
+        Date now = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat hourFormat = new SimpleDateFormat("HH");
+        SimpleDateFormat minuteFormat = new SimpleDateFormat("mm");
+
+        String date = dateFormat.format(now);
+        String time = "";
+        String hour = hourFormat.format(now);
+        String minute = minuteFormat.format(now);
+        log.info("date:{}, hour:{}, minute:{}", date, hour, minute);
+
+        int h = Integer.parseInt(hour);
+        int m = Integer.parseInt(minute);
+        if(m <= 40) {
+            h = h - 1;
+            if(h < 0) {
+                Calendar c = Calendar.getInstance();
+                c.setTime(now);
+                c.add(Calendar.DATE, -1);
+                Date before = c.getTime();
+                date = dateFormat.format(before);
+                h = 23;
+            }
+        }
+        time = String.format("%02d", h) + "00";
+
+        WindDataDto res = new WindDataDto();
+        res.setWind(windService.findAllByBaseDateAndBaseTime(date, time).stream()
+                .map(WindDto::new)
+                .collect(toList()));
+
+        res.setRoadPoint(windService.findAllRoadPoint().stream()
+                .map(RoadPointDto::new)
+                .collect(toList()));
+
+        return success(res);
     }
 
 }
