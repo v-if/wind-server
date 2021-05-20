@@ -24,3 +24,5 @@ logging:
     com.cntt.kiosk.server.LoggingRequestInterceptor: DEBUG
   file:
     path: "/home/wind-server/logs"
+images:
+  path: "/home/wind-server/images/"
