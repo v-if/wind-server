@@ -1,4 +1,4 @@
-package com.github.tkpark.image;
+package com.github.tkpark.wind;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,13 +21,21 @@ public class RoadMaster implements Serializable {
     @Column(name = "[road]")
     private String road;
 
+    @Column(name = "[road_nm]")
+    private String roadNm;
+
+    @Column(name = "[seq]")
+    private int seq;
+
     @Column(name = "[image_file_name]")
     private String imageFileName;
 
-    public RoadMaster(String road, String imageFileName) {
+    public RoadMaster(String road, String roadNm, int seq, String imageFileName) {
         checkNotNull(road, "road must be provided");
 
         this.road = road;
+        this.roadNm = roadNm;
+        this.seq = seq;
         this.imageFileName = imageFileName;
     }
 

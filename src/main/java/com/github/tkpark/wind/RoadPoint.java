@@ -24,9 +24,6 @@ public class RoadPoint implements Serializable {
     @Column(name = "[road_point]")
     private String roadPoint;
 
-    @Column(name = "[road_nm]")
-    private String roadNm;
-
     @Column(name = "[nx]")
     private String nx;
 
@@ -37,16 +34,15 @@ public class RoadPoint implements Serializable {
     private String requestYn;
 
     public RoadPoint(String road, String roadPoint) {
-        this(road, roadPoint, null, null, null, null);
+        this(road, roadPoint, null, null, null);
     }
 
-    public RoadPoint(String road, String roadPoint, String roadNm, String nx, String ny, String requestYn) {
+    public RoadPoint(String road, String roadPoint, String nx, String ny, String requestYn) {
         checkNotNull(road, "road must be provided");
         checkNotNull(roadPoint, "roadPoint must be provided");
 
         this.road = road;
         this.roadPoint = roadPoint;
-        this.roadNm = roadNm;
         this.nx = nx;
         this.ny = ny;
         this.requestYn = requestYn;

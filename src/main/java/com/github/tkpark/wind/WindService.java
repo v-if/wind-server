@@ -27,6 +27,8 @@ public class WindService {
 
     private final RoadPointRepository roadPointRepository;
 
+    private final RoadMasterRepository roadMasterRepository;
+
     @Value("${data-api.service-key}")
     private String SERVICE_KEY;
 
@@ -42,14 +44,20 @@ public class WindService {
     @Value("${data-api.fcst-version}")
     private String FCST_VERSION; // 예보버전조회
 
-    public WindService(WindRepository windRepository, RoadPointRepository roadPointRepository) {
+    public WindService(WindRepository windRepository, RoadPointRepository roadPointRepository, RoadMasterRepository roadMasterRepository) {
         this.windRepository = windRepository;
         this.roadPointRepository = roadPointRepository;
+        this.roadMasterRepository = roadMasterRepository;
     }
 
     @Transactional(readOnly = true)
     public List<Wind> findAllByBaseDateAndBaseTime(String baseDate, String baseTime) {
         return windRepository.findAllByBaseDateAndBaseTime(baseDate, baseTime);
+    }
+
+    @Transactional(readOnly = true)
+    public Wind findByWindData(String baseDate, String baseTime, String nx, String ny) {
+        return windRepository.findByBaseDateAndBaseTimeAndNxAndNy(baseDate, baseTime, nx, ny);
     }
 
     @Transactional(readOnly = true)
@@ -62,6 +70,16 @@ public class WindService {
         return roadPointRepository.findAllByRequestYnOrderByNxAscNyAsc("Y");
     }
 
+    @Transactional(readOnly = true)
+    public List<RoadPoint> findByRoadPointList(String code) {
+        return roadPointRepository.findByRoad(code);
+    }
+
+    @Transactional(readOnly = true)
+    public List<RoadMaster> findAllRoadMaster() {
+        return roadMasterRepository.findAllByOrderBySeqAsc();
+    }
+
     @Transactional
     public String save(String date, String time) {
         log.info("WindService.save(), date:{}, time:{}", date, time);
@@ -70,7 +88,7 @@ public class WindService {
         log.debug("roadList.size():{}", roadList.size());
 
         for(RoadPoint road : roadList) {
-            log.debug("road:{}, roadPoint:{}, roadNm:{}, nx:{}, ny:{}", road.getRoad(), road.getRoadPoint(), road.getRoadNm(), road.getNx(), road.getNy());
+            log.debug("road:{}, roadPoint:{}, nx:{}, ny:{}", road.getRoad(), road.getRoadPoint(), road.getNx(), road.getNy());
 
             ArrayList<Wind> list = new ArrayList<>();
             HttpHeaders headers = new HttpHeaders();

@@ -1,5 +1,6 @@
 package com.github.tkpark.image;
 
+import com.github.tkpark.wind.RoadMaster;
 import org.springframework.data.repository.Repository;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;

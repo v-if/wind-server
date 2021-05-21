@@ -1,11 +1,10 @@
 package com.github.tkpark.wind;
 
+import com.github.tkpark.utils.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.tkpark.utils.ApiUtils.ApiResult;
@@ -39,31 +38,8 @@ public class WindRestController {
     public ApiResult<List<WindDto>> findAll() {
         log.info("========= api/wind =========");
 
-        Date now = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        SimpleDateFormat hourFormat = new SimpleDateFormat("HH");
-        SimpleDateFormat minuteFormat = new SimpleDateFormat("mm");
-
-        String date = dateFormat.format(now);
-        String time = "";
-        String hour = hourFormat.format(now);
-        String minute = minuteFormat.format(now);
-        log.info("date:{}, hour:{}, minute:{}", date, hour, minute);
-
-        int h = Integer.parseInt(hour);
-        int m = Integer.parseInt(minute);
-        if(m <= 40) {
-            h = h - 1;
-            if(h < 0) {
-                Calendar c = Calendar.getInstance();
-                c.setTime(now);
-                c.add(Calendar.DATE, -1);
-                Date before = c.getTime();
-                date = dateFormat.format(before);
-                h = 23;
-            }
-        }
-        time = String.format("%02d", h) + "00";
+        String date = DateTimeUtils.getDate();
+        String time = DateTimeUtils.getTime();
         //windService.save(date, time);
 
         return success(windService.findAllByBaseDateAndBaseTime(date, time).stream()
@@ -75,32 +51,10 @@ public class WindRestController {
 
     @GetMapping(path = "data")
     public ApiResult<WindDataDto> data() {
+        log.info("========= api/wind/data =========");
 
-        Date now = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        SimpleDateFormat hourFormat = new SimpleDateFormat("HH");
-        SimpleDateFormat minuteFormat = new SimpleDateFormat("mm");
-
-        String date = dateFormat.format(now);
-        String time = "";
-        String hour = hourFormat.format(now);
-        String minute = minuteFormat.format(now);
-        log.info("date:{}, hour:{}, minute:{}", date, hour, minute);
-
-        int h = Integer.parseInt(hour);
-        int m = Integer.parseInt(minute);
-        if(m <= 40) {
-            h = h - 1;
-            if(h < 0) {
-                Calendar c = Calendar.getInstance();
-                c.setTime(now);
-                c.add(Calendar.DATE, -1);
-                Date before = c.getTime();
-                date = dateFormat.format(before);
-                h = 23;
-            }
-        }
-        time = String.format("%02d", h) + "00";
+        String date = DateTimeUtils.getDate();
+        String time = DateTimeUtils.getTime();
 
         WindDataDto res = new WindDataDto();
         res.setWind(windService.findAllByBaseDateAndBaseTime(date, time).stream()
@@ -108,6 +62,46 @@ public class WindRestController {
                 .collect(toList()));
 
         res.setRoadPoint(windService.findAllRoadPoint().stream()
+                .map(RoadPointDto::new)
+                .collect(toList()));
+
+        return success(res);
+    }
+
+    @GetMapping(path = "road")
+    public ApiResult<List<RoadMasterDto>> road() {
+        log.info("========= api/wind/road =========");
+
+        return success(windService.findAllRoadMaster().stream()
+                .map(RoadMasterDto::new)
+                .collect(toList())
+        );
+    }
+
+    @GetMapping(path = "road/{code}")
+    public ApiResult<WindDataDto> roadData(@PathVariable String code) {
+        log.info("========= api/wind/road/{} =========", code);
+
+        String date = DateTimeUtils.getDate();
+        String time = DateTimeUtils.getTime();
+
+        List<RoadPoint> roadPoint = windService.findByRoadPointList(code);
+        List<Wind> wind = new ArrayList<>();
+        for(RoadPoint road : roadPoint) {
+            String nx = road.getNx();
+            String ny = road.getNy();
+            log.info("road:{}, nx:{}, ny:{}", road.getRoad(), nx, ny);
+
+            Wind windItem = windService.findByWindData(date, time, nx, ny);
+            wind.add(windItem);
+        }
+
+        WindDataDto res = new WindDataDto();
+        res.setWind(wind.stream()
+                .map(WindDto::new)
+                .collect(toList()));
+
+        res.setRoadPoint(roadPoint.stream()
                 .map(RoadPointDto::new)
                 .collect(toList()));
 

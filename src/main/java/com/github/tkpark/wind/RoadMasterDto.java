@@ -5,17 +5,17 @@ import lombok.Data;
 import static org.springframework.beans.BeanUtils.copyProperties;
 
 @Data
-public class RoadPointDto {
+public class RoadMasterDto {
 
     private String road;
 
-    private String roadPoint;
+    private String roadNm;
 
-    private String nx;
+    private int seq;
 
-    private String ny;
+    private String imageFileName;
 
-    public RoadPointDto(RoadPoint source) {
+    public RoadMasterDto(RoadMaster source) {
         copyProperties(source, this);
     }
 }

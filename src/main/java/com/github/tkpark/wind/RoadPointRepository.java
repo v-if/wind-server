@@ -11,6 +11,8 @@ public interface RoadPointRepository extends Repository<RoadPoint, Long> {
 
     List<RoadPoint> findAllByRequestYnOrderByNxAscNyAsc(String requestYn);
 
+    List<RoadPoint> findByRoad(String road);
+
     RoadPoint save(RoadPoint item);
 
 }
