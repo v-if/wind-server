@@ -87,6 +87,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/users/signup").permitAll()
                 .antMatchers("/api/products/**").permitAll()
                 .antMatchers("/api/wind/**").permitAll()
+                .antMatchers("/api/board/**").permitAll()
                 .antMatchers("/api/**").hasRole(Role.USER.name())
                 .anyRequest().permitAll()
                 .and()
