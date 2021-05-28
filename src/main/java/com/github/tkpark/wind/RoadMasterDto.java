@@ -15,6 +15,10 @@ public class RoadMasterDto {
 
     private String imageFileName;
 
+    private String latitude;
+
+    private String longitude;
+
     public RoadMasterDto(RoadMaster source) {
         copyProperties(source, this);
     }

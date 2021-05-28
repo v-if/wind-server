@@ -30,13 +30,21 @@ public class RoadMaster implements Serializable {
     @Column(name = "[image_file_name]")
     private String imageFileName;
 
-    public RoadMaster(String road, String roadNm, int seq, String imageFileName) {
+    @Column(name = "[latitude]")
+    private String latitude;
+
+    @Column(name = "[longitude]")
+    private String longitude;
+
+    public RoadMaster(String road, String roadNm, int seq, String imageFileName, String latitude, String longitude) {
         checkNotNull(road, "road must be provided");
 
         this.road = road;
         this.roadNm = roadNm;
         this.seq = seq;
         this.imageFileName = imageFileName;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public static class Key implements Serializable {

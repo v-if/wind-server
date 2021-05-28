@@ -1,7 +1,9 @@
 spring:
   datasource:
-    url: jdbc:log4jdbc:mysql://${db-server.db-url}/${db-server.db-database-name}?autoReconnect=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul
-    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    #url: jdbc:log4jdbc:mysql://${db-server.db-url}/${db-server.db-database-name}?autoReconnect=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul
+    #driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:mysql://${db-server.db-url}/${db-server.db-database-name}?useSSL=false&autoReconnect=true&useUnicode=true&characterEncoding=utf8&jdbcCompliantTruncation=false&allowMultiQueries=true&serverTimezone=Asia/Seoul
+    driver-class-name: com.mysql.jdbc.Driver
     username: ${db-server.db-username}
     password: ${db-server.db-password}
     max-active: 5

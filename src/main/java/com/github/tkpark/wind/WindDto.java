@@ -14,6 +14,10 @@ public class WindDto {
 
     private String ny;
 
+    private String longitude;
+
+    private String latitude;
+
     private String pty;
 
     private String reh;

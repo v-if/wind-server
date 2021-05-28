@@ -37,6 +37,12 @@ public class Wind implements Serializable {
     @Column(name = "[ny]")
     private String ny;
 
+    @Column(name = "[longitude]")
+    private String longitude;
+
+    @Column(name = "[latitude]")
+    private String latitude;
+
     @Column(name = "[pty]")
     private String pty;
 
@@ -71,10 +77,10 @@ public class Wind implements Serializable {
     private LocalDateTime createDate;
 
     public Wind(String baseDate, String baseTime, String nx, String ny, String create) {
-        this(baseDate, baseTime, nx, ny, "0", "0", "0", "0", "0", "0", "0", "0", "", create, null);
+        this(baseDate, baseTime, nx, ny, null, null, "0", "0", "0", "0", "0", "0", "0", "0", "", create, null);
     }
 
-    public Wind(String baseDate, String baseTime, String nx, String ny, String pty, String reh, String rn1, String t1h, String uuu, String vec, String vvv, String wsd, String wd16, String create, LocalDateTime createDate) {
+    public Wind(String baseDate, String baseTime, String nx, String ny, String longitude, String latitude, String pty, String reh, String rn1, String t1h, String uuu, String vec, String vvv, String wsd, String wd16, String create, LocalDateTime createDate) {
         checkNotNull(baseDate, "baseDate must be provided");
         checkNotNull(baseTime, "baseTime must be provided");
         checkArgument(isNotEmpty(nx), "nx must be provided");
@@ -85,6 +91,8 @@ public class Wind implements Serializable {
         this.baseTime = baseTime;
         this.nx = nx;
         this.ny = ny;
+        this.longitude = longitude;
+        this.latitude = latitude;
         this.pty = pty;
         this.reh = reh;
         this.rn1 = rn1;

@@ -17,7 +17,8 @@ public class Scheduler {
     @Autowired
     WindService windService;
 
-    @Scheduled(cron = "30 0/10 * * * *")
+    //@Scheduled(cron = "30 5/10 * * * *") // 10분에 한번씩 호출
+    @Scheduled(cron = "30 0/30 * * * *") // 30분에 한번씩 호출
     public void save() {
         log.info("Scheduler.save() ");
 

@@ -29,6 +29,8 @@ public class WindService {
 
     private final RoadMasterRepository roadMasterRepository;
 
+    private final WindLocationRepository windLocationRepository;
+
     @Value("${data-api.service-key}")
     private String SERVICE_KEY;
 
@@ -44,10 +46,11 @@ public class WindService {
     @Value("${data-api.fcst-version}")
     private String FCST_VERSION; // 예보버전조회
 
-    public WindService(WindRepository windRepository, RoadPointRepository roadPointRepository, RoadMasterRepository roadMasterRepository) {
+    public WindService(WindRepository windRepository, RoadPointRepository roadPointRepository, RoadMasterRepository roadMasterRepository, WindLocationRepository windLocationRepository) {
         this.windRepository = windRepository;
         this.roadPointRepository = roadPointRepository;
         this.roadMasterRepository = roadMasterRepository;
+        this.windLocationRepository = windLocationRepository;
     }
 
     @Transactional(readOnly = true)
@@ -84,11 +87,11 @@ public class WindService {
     public String save(String date, String time) {
         log.info("WindService.save(), date:{}, time:{}", date, time);
 
-        List<RoadPoint> roadList = roadPointRepository.findAllByRequestYnOrderByNxAscNyAsc("Y");
-        log.debug("roadList.size():{}", roadList.size());
+        List<WindLocation> windLocationList = windLocationRepository.findAll();
+        log.debug("windLocationList.size():{}", windLocationList.size());
 
-        for(RoadPoint road : roadList) {
-            log.debug("road:{}, roadPoint:{}, nx:{}, ny:{}", road.getRoad(), road.getRoadPoint(), road.getNx(), road.getNy());
+        for(WindLocation windLocation : windLocationList) {
+            log.debug("id:{}, nx:{}, ny:{}", windLocation.getId(), windLocation.getNx(), windLocation.getNy());
 
             ArrayList<Wind> list = new ArrayList<>();
             HttpHeaders headers = new HttpHeaders();
@@ -103,13 +106,13 @@ public class WindService {
                     .queryParam("dataType", "XML")
                     .queryParam("base_date", date)
                     .queryParam("base_time", time)
-                    .queryParam("nx", road.getNx())
-                    .queryParam("ny", road.getNy())
+                    .queryParam("nx", windLocation.getNx())
+                    .queryParam("ny", windLocation.getNy())
                     .build();
 
             try {
                 resEntity = commonService.request(builder.toUri(), HttpMethod.GET, reqEntity, new ParameterizedTypeReference<String>() {});
-                log.info("res:{}", resEntity.getBody());
+                //log.info("res:{}", resEntity.getBody());
 
                 XmlMapper mapper = new XmlMapper();
                 UltraSrtNcst.Response res = mapper.readValue(resEntity.getBody(), UltraSrtNcst.Response.class);
@@ -120,6 +123,8 @@ public class WindService {
                     String baseTime = "";
                     String nx = "";
                     String ny = "";
+                    String longitude = windLocation.getLongitude();
+                    String latitude = windLocation.getLatitude();
                     String pty = "";
                     String reh = "";
                     String rn1 = "";
@@ -202,7 +207,7 @@ public class WindService {
                                 break;
                         }
                     }
-                    list.add(new Wind(baseDate, baseTime, nx, ny, pty, reh, rn1, t1h, uuu, vec, vvv, wsd, wd16,"bacth", null));
+                    list.add(new Wind(baseDate, baseTime, nx, ny, longitude, latitude, pty, reh, rn1, t1h, uuu, vec, vvv, wsd, wd16,"bacth", null));
                 }
             } catch(Exception e) {
                 log.error("e:", e);
