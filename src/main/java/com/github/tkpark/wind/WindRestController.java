@@ -35,15 +35,15 @@ public class WindRestController {
     */
 
     @GetMapping
-    public ApiResult<List<WindDto>> findAll() {
+    public ApiResult<List<WindLocationDataDto>> findAll() {
         log.info("========= api/wind =========");
 
-        String date = DateTimeUtils.getDate();
-        String time = DateTimeUtils.getTime();
+        //String date = DateTimeUtils.getDate();
+        //String time = DateTimeUtils.getTime();
         //windService.save(date, time);
 
-        return success(windService.findAllByBaseDateAndBaseTime(date, time).stream()
-                .map(WindDto::new)
+        return success(windService.findAllWindLocationData().stream()
+                .map(WindLocationDataDto::new)
                 .collect(toList())
         );
     }

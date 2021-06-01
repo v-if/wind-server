@@ -1,5 +1,7 @@
 package com.github.tkpark.wind;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,5 +15,11 @@ public interface WindLocationRepository extends Repository<WindLocation, Long> {
     Optional<WindLocation> findById(String id);
 
     List<WindLocation> findAll();
+
+    @Query(value = "SELECT NX, NY" +
+            " FROM wind_location" +
+            " GROUP BY NX, NY ", nativeQuery = true)
+    @Cacheable({"wind_location"})
+    List<WindLocationInterface> findAllGroupBy();
 
 }

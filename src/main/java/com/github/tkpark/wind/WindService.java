@@ -13,7 +13,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,6 +30,8 @@ public class WindService {
 
     private final WindLocationRepository windLocationRepository;
 
+    private final WindLocationDataRepository windLocationDataRepository;
+
     @Value("${data-api.service-key}")
     private String SERVICE_KEY;
 
@@ -46,11 +47,18 @@ public class WindService {
     @Value("${data-api.fcst-version}")
     private String FCST_VERSION; // 예보버전조회
 
-    public WindService(WindRepository windRepository, RoadPointRepository roadPointRepository, RoadMasterRepository roadMasterRepository, WindLocationRepository windLocationRepository) {
+    public WindService(WindRepository windRepository, RoadPointRepository roadPointRepository
+            , RoadMasterRepository roadMasterRepository, WindLocationRepository windLocationRepository, WindLocationDataRepository windLocationDataRepository) {
         this.windRepository = windRepository;
         this.roadPointRepository = roadPointRepository;
         this.roadMasterRepository = roadMasterRepository;
         this.windLocationRepository = windLocationRepository;
+        this.windLocationDataRepository = windLocationDataRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<WindLocationData> findAllWindLocationData() {
+        return windLocationDataRepository.findAll();
     }
 
     @Transactional(readOnly = true)
@@ -87,13 +95,13 @@ public class WindService {
     public String save(String date, String time) {
         log.info("WindService.save(), date:{}, time:{}", date, time);
 
-        List<WindLocation> windLocationList = windLocationRepository.findAll();
+        List<WindLocationInterface> windLocationList = windLocationRepository.findAllGroupBy();
         log.debug("windLocationList.size():{}", windLocationList.size());
 
-        for(WindLocation windLocation : windLocationList) {
-            log.debug("id:{}, nx:{}, ny:{}", windLocation.getId(), windLocation.getNx(), windLocation.getNy());
+        for(WindLocationInterface windLocation : windLocationList) {
+            log.debug("nx:{}, ny:{}", windLocation.getNx(), windLocation.getNy());
 
-            ArrayList<Wind> list = new ArrayList<>();
+            //ArrayList<Wind> list = new ArrayList<>();
             HttpHeaders headers = new HttpHeaders();
             headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
             HttpEntity<MultiValueMap<String, String>> reqEntity = new HttpEntity<>(headers);
@@ -123,8 +131,8 @@ public class WindService {
                     String baseTime = "";
                     String nx = "";
                     String ny = "";
-                    String longitude = windLocation.getLongitude();
-                    String latitude = windLocation.getLatitude();
+                    String longitude = "";
+                    String latitude = "";
                     String pty = "";
                     String reh = "";
                     String rn1 = "";
@@ -207,15 +215,16 @@ public class WindService {
                                 break;
                         }
                     }
-                    list.add(new Wind(baseDate, baseTime, nx, ny, longitude, latitude, pty, reh, rn1, t1h, uuu, vec, vvv, wsd, wd16,"bacth", null));
+                    //list.add();
+                    windRepository.save(new Wind(baseDate, baseTime, nx, ny, longitude, latitude, pty, reh, rn1, t1h, uuu, vec, vvv, wsd, wd16,"bacth", null));
                 }
             } catch(Exception e) {
                 log.error("e:", e);
             }
 
-            for(Wind wind : list) {
+            /*for(Wind wind : list) {
                 windRepository.save(wind);
-            }
+            }*/
         }
         return "Success";
     }
