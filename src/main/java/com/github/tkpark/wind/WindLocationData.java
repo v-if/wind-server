@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "vm_wind_location_data")
+@Table(name = "vm_wind_location_data2")
 @Getter
 @Setter
 @NoArgsConstructor
