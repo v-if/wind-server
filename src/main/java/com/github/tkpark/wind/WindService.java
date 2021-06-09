@@ -101,7 +101,6 @@ public class WindService {
         for(WindLocationInterface windLocation : windLocationList) {
             log.debug("nx:{}, ny:{}", windLocation.getNx(), windLocation.getNy());
 
-            //ArrayList<Wind> list = new ArrayList<>();
             HttpHeaders headers = new HttpHeaders();
             headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
             HttpEntity<MultiValueMap<String, String>> reqEntity = new HttpEntity<>(headers);
@@ -185,7 +184,7 @@ public class WindService {
                             case "T1H":
                                 t1h = item.getObsrValue();
                                 if(tempValue >= 900.0f || tempValue <= -900.0f) {
-                                    t1h = "0";
+                                    t1h = "error";
                                 }
                                 break;
                             case "UUU":
@@ -215,16 +214,13 @@ public class WindService {
                                 break;
                         }
                     }
-                    //list.add();
-                    windRepository.save(new Wind(baseDate, baseTime, nx, ny, longitude, latitude, pty, reh, rn1, t1h, uuu, vec, vvv, wsd, wd16,"bacth", null));
+                    if(!t1h.equals("error")) {
+                        windRepository.save(new Wind(baseDate, baseTime, nx, ny, longitude, latitude, pty, reh, rn1, t1h, uuu, vec, vvv, wsd, wd16,"bacth", null));
+                    }
                 }
             } catch(Exception e) {
                 log.error("e:", e);
             }
-
-            /*for(Wind wind : list) {
-                windRepository.save(wind);
-            }*/
         }
         return "Success";
     }
