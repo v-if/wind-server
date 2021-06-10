@@ -27,6 +27,8 @@ public class WindLocationDataDto {
 
     private String latitude;
 
+    private String distance;
+
     private String pty;
 
     private String reh;
@@ -44,6 +46,8 @@ public class WindLocationDataDto {
     private String wsd;
 
     private String wd16;
+
+    private String createDate;
 
     public WindLocationDataDto(WindLocationData source) {
         copyProperties(source, this);

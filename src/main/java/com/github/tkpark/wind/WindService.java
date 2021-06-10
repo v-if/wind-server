@@ -62,6 +62,11 @@ public class WindService {
     }
 
     @Transactional(readOnly = true)
+    public List<WindLocationData> findAllWindLocationDataDistance(String latitude, String longitude) {
+        return windLocationDataRepository.findAllWindLocationDataDistance(latitude, longitude);
+    }
+
+    @Transactional(readOnly = true)
     public List<Wind> findAllByBaseDateAndBaseTime(String baseDate, String baseTime) {
         return windRepository.findAllByBaseDateAndBaseTime(baseDate, baseTime);
     }

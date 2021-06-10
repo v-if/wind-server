@@ -6,7 +6,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "vm_wind_location_data2")
@@ -46,6 +45,9 @@ public class WindLocationData implements Serializable {
     @Column(name = "[latitude]")
     private String latitude;
 
+    @Column(name = "[distance]")
+    private String distance;
+
     @Column(name = "[pty]")
     private String pty;
 
@@ -72,5 +74,8 @@ public class WindLocationData implements Serializable {
 
     @Column(name = "[wd16]")
     private String wd16;
+
+    @Column(name = "[create_date]")
+    private String createDate;
 
 }

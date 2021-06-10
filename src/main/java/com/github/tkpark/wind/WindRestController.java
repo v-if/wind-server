@@ -38,34 +38,10 @@ public class WindRestController {
     public ApiResult<List<WindLocationDataDto>> findAll() {
         log.info("========= api/wind =========");
 
-        //String date = DateTimeUtils.getDate();
-        //String time = DateTimeUtils.getTime();
-        //windService.save(date, time);
-
         return success(windService.findAllWindLocationData().stream()
                 .map(WindLocationDataDto::new)
                 .collect(toList())
         );
-    }
-
-
-    @GetMapping(path = "data")
-    public ApiResult<WindDataDto> data() {
-        log.info("========= api/wind/data =========");
-
-        String date = DateTimeUtils.getDate();
-        String time = DateTimeUtils.getTime();
-
-        WindDataDto res = new WindDataDto();
-        res.setWind(windService.findAllByBaseDateAndBaseTime(date, time).stream()
-                .map(WindDto::new)
-                .collect(toList()));
-
-        res.setRoadPoint(windService.findAllRoadPoint().stream()
-                .map(RoadPointDto::new)
-                .collect(toList()));
-
-        return success(res);
     }
 
     @GetMapping(path = "road")
@@ -74,6 +50,16 @@ public class WindRestController {
 
         return success(windService.findAllRoadMaster().stream()
                 .map(RoadMasterDto::new)
+                .collect(toList())
+        );
+    }
+
+    @GetMapping(path = "data/{latitude}/{longitude}")
+    public ApiResult<List<WindLocationDataDto>> data(@PathVariable String latitude, @PathVariable String longitude) {
+        log.info("========= api/wind/data/{}/{} =========", latitude, longitude);
+
+        return success(windService.findAllWindLocationDataDistance(latitude, longitude).stream()
+                .map(WindLocationDataDto::new)
                 .collect(toList())
         );
     }
