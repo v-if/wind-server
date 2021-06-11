@@ -135,8 +135,6 @@ public class WindService {
                     String baseTime = "";
                     String nx = "";
                     String ny = "";
-                    String longitude = "";
-                    String latitude = "";
                     String pty = "";
                     String reh = "";
                     String rn1 = "";
@@ -220,7 +218,7 @@ public class WindService {
                         }
                     }
                     if(!t1h.equals("error")) {
-                        windRepository.save(new Wind(baseDate, baseTime, nx, ny, longitude, latitude, pty, reh, rn1, t1h, uuu, vec, vvv, wsd, wd16,"bacth", null));
+                        windRepository.save(new Wind(baseDate, baseTime, nx, ny, pty, reh, rn1, t1h, uuu, vec, vvv, wsd, wd16,"bacth", null));
                     }
                 }
             } catch(Exception e) {

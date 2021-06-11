@@ -79,7 +79,9 @@ public class WindRestController {
             log.info("road:{}, nx:{}, ny:{}", road.getRoad(), nx, ny);
 
             Wind windItem = windService.findByWindData(date, time, nx, ny);
-            wind.add(windItem);
+            if(windItem != null) {
+                wind.add(windItem);
+            }
         }
 
         WindDataDto res = new WindDataDto();
