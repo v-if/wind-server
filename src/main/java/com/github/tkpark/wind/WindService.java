@@ -1,6 +1,7 @@
 package com.github.tkpark.wind;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.github.tkpark.data.UltraSrtFcst;
 import com.github.tkpark.data.UltraSrtNcst;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,10 @@ public class WindService {
 
     private final WindLocationDataRepository windLocationDataRepository;
 
+    private final WindForecastRepository windForecastRepository;
+
+    private final WindForecastDataRepository windForecastDataRepository;
+
     @Value("${data-api.service-key}")
     private String SERVICE_KEY;
 
@@ -48,12 +53,15 @@ public class WindService {
     private String FCST_VERSION; // 예보버전조회
 
     public WindService(WindRepository windRepository, RoadPointRepository roadPointRepository
-            , RoadMasterRepository roadMasterRepository, WindLocationRepository windLocationRepository, WindLocationDataRepository windLocationDataRepository) {
+            , RoadMasterRepository roadMasterRepository, WindLocationRepository windLocationRepository
+            , WindLocationDataRepository windLocationDataRepository, WindForecastRepository windForecastRepository, WindForecastDataRepository windForecastDataRepository) {
         this.windRepository = windRepository;
         this.roadPointRepository = roadPointRepository;
         this.roadMasterRepository = roadMasterRepository;
         this.windLocationRepository = windLocationRepository;
         this.windLocationDataRepository = windLocationDataRepository;
+        this.windForecastRepository = windForecastRepository;
+        this.windForecastDataRepository = windForecastDataRepository;
     }
 
     @Transactional(readOnly = true)
@@ -64,6 +72,11 @@ public class WindService {
     @Transactional(readOnly = true)
     public List<WindLocationData> findAllWindLocationDataDistance(String latitude, String longitude) {
         return windLocationDataRepository.findAllWindLocationDataDistance(latitude, longitude);
+    }
+
+    @Transactional(readOnly = true)
+    public List<WindForecastData> findAllWindForecastDataDistance(String latitude, String longitude) {
+        return windForecastDataRepository.findAllWindForecastDataDistance(latitude, longitude);
     }
 
     @Transactional(readOnly = true)
@@ -97,8 +110,8 @@ public class WindService {
     }
 
     @Transactional
-    public String save(String date, String time) {
-        log.info("WindService.save(), date:{}, time:{}", date, time);
+    public String windData(String date, String time) {
+        log.info("WindService.windData(), date:{}, time:{}", date, time);
 
         List<WindLocationInterface> windLocationList = windLocationRepository.findAllGroupBy();
         log.debug("windLocationList.size():{}", windLocationList.size());
@@ -128,7 +141,7 @@ public class WindService {
 
                 XmlMapper mapper = new XmlMapper();
                 UltraSrtNcst.Response res = mapper.readValue(resEntity.getBody(), UltraSrtNcst.Response.class);
-                log.info("ResultCode:{}, ResultMsg:{}", res.getHeader().getResultCode(), res.getHeader().getResultMsg());
+                log.info("resultCode:{}, resultMsg:{}", res.getHeader().getResultCode(), res.getHeader().getResultMsg());
 
                 if(res.getHeader().getResultCode().equals("00") && res.getBody().getItems().size() > 0) {
                     String baseDate = "";
@@ -219,6 +232,109 @@ public class WindService {
                     }
                     if(!t1h.equals("error")) {
                         windRepository.save(new Wind(baseDate, baseTime, nx, ny, pty, reh, rn1, t1h, uuu, vec, vvv, wsd, wd16,"bacth", null));
+                    }
+                }
+            } catch(Exception e) {
+                log.error("e:", e);
+            }
+        }
+        return "Success";
+    }
+
+    @Transactional
+    public String windForecast(String date, String time) {
+        log.info("WindService.windForecast(), date:{}, time:{}", date, time);
+
+        List<WindLocationInterface> windLocationList = windLocationRepository.findAllGroupBy();
+        log.debug("windLocationList.size():{}", windLocationList.size());
+
+        for(WindLocationInterface windLocation : windLocationList) {
+            log.debug("nx:{}, ny:{}", windLocation.getNx(), windLocation.getNy());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+            HttpEntity<MultiValueMap<String, String>> reqEntity = new HttpEntity<>(headers);
+            ResponseEntity<String> resEntity = null;
+
+            UriComponents builder = UriComponentsBuilder.fromHttpUrl(ULTRA_SRT_FCST)
+                    .queryParam("serviceKey", SERVICE_KEY)
+                    .queryParam("pageNo", "1")
+                    .queryParam("numOfRows", "60")
+                    .queryParam("dataType", "XML")
+                    .queryParam("base_date", date)
+                    .queryParam("base_time", time)
+                    .queryParam("nx", windLocation.getNx())
+                    .queryParam("ny", windLocation.getNy())
+                    .build();
+
+            try {
+                resEntity = commonService.request(builder.toUri(), HttpMethod.GET, reqEntity, new ParameterizedTypeReference<String>() {});
+                //log.info("res:{}", resEntity.getBody());
+
+                XmlMapper mapper = new XmlMapper();
+                UltraSrtFcst.Response res = mapper.readValue(resEntity.getBody(), UltraSrtFcst.Response.class);
+                log.info("resultCode:{}, resultMsg:{}, totalCount:{}", res.getHeader().getResultCode(), res.getHeader().getResultMsg(), res.getBody().getTotalCount());
+
+                int fcstCnt = res.getBody().getTotalCount() / 10;
+
+                WindForecast[] forecastArr = new WindForecast[fcstCnt];
+
+                if(res.getHeader().getResultCode().equals("00") && res.getBody().getItems().size() > 0) {
+
+                    for(int i=0; i<res.getBody().getItems().size(); i++) {
+                        UltraSrtFcst.Response.Body.Item item = res.getBody().getItems().get(i);
+
+                        if(item.getCategory() == null)
+                            continue;
+
+                        int num = i % fcstCnt;
+
+                        if(forecastArr[num] == null) {
+                            String baseDate = item.getBaseDate();
+                            String baseTime = item.getBaseTime();
+                            String nx = String.valueOf(item.getNx());
+                            String ny = String.valueOf(item.getNy());
+                            String forecastTime = item.getFcstTime();
+
+                            forecastArr[num] = new WindForecast(baseDate, baseTime, nx, ny, forecastTime, "bacth");
+                        }
+
+                        switch(item.getCategory()) {
+                            case "LGT":
+                                forecastArr[num].setLgt(item.getFcstValue());
+                                break;
+                            case "PTY":
+                                forecastArr[num].setPty(item.getFcstValue());
+                                break;
+                            case "RN1":
+                                forecastArr[num].setRn1(item.getFcstValue());
+                                break;
+                            case "SKY":
+                                forecastArr[num].setSky(item.getFcstValue());
+                                break;
+                            case "T1H":
+                                forecastArr[num].setT1h(item.getFcstValue());
+                                break;
+                            case "REH":
+                                forecastArr[num].setReh(item.getFcstValue());
+                                break;
+                            case "UUU":
+                                forecastArr[num].setUuu(item.getFcstValue());
+                                break;
+                            case "VVV":
+                                forecastArr[num].setVvv(item.getFcstValue());
+                                break;
+                            case "VEC":
+                                forecastArr[num].setVec(item.getFcstValue());
+                                forecastArr[num].setWd16(calcWindDirection16(item.getFcstValue()));
+                                break;
+                            case "WSD":
+                                forecastArr[num].setWsd(item.getFcstValue());
+                                break;
+                        }
+                    }
+                    for(int i=0; i<forecastArr.length; i++) {
+                        windForecastRepository.save(forecastArr[i]);
                     }
                 }
             } catch(Exception e) {

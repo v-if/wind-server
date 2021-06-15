@@ -64,6 +64,16 @@ public class WindRestController {
         );
     }
 
+    @GetMapping(path = "forecast/{latitude}/{longitude}")
+    public ApiResult<List<WindForecastDataDto>> forecast(@PathVariable String latitude, @PathVariable String longitude) {
+        log.info("========= api/wind/forecast/{}/{} =========", latitude, longitude);
+
+        return success(windService.findAllWindForecastDataDistance(latitude, longitude).stream()
+                .map(WindForecastDataDto::new)
+                .collect(toList())
+        );
+    }
+
     @GetMapping(path = "road/{code}")
     public ApiResult<WindDataDto> roadData(@PathVariable String code) {
         log.info("========= api/wind/road/{} =========", code);
