@@ -294,7 +294,7 @@ public class WindService {
                             String baseTime = item.getBaseTime();
                             String nx = String.valueOf(item.getNx());
                             String ny = String.valueOf(item.getNy());
-                            String forecastTime = item.getFcstTime();
+                            String forecastTime = item.getFcstDate() + item.getFcstTime();
 
                             forecastArr[num] = new WindForecast(baseDate, baseTime, nx, ny, forecastTime, "bacth");
                         }
