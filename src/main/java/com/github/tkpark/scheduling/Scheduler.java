@@ -20,7 +20,7 @@ public class Scheduler {
     /**
      * 동네예보 초단기실황
      */
-    @Scheduled(cron = "10 0/10 * * * *") // 30분에 한번씩 호출
+    //@Scheduled(cron = "10 0/10 * * * *") // 30분에 한번씩 호출
     public void windData() {
         log.info("Scheduler.windData() ");
 

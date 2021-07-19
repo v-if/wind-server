@@ -25,13 +25,9 @@ public class WindService {
 
     private final WindRepository windRepository;
 
-    private final RoadPointRepository roadPointRepository;
-
     private final RoadMasterRepository roadMasterRepository;
 
     private final WindLocationRepository windLocationRepository;
-
-    private final WindLocationDataRepository windLocationDataRepository;
 
     private final WindForecastRepository windForecastRepository;
 
@@ -52,56 +48,18 @@ public class WindService {
     @Value("${data-api.fcst-version}")
     private String FCST_VERSION; // 예보버전조회
 
-    public WindService(WindRepository windRepository, RoadPointRepository roadPointRepository
-            , RoadMasterRepository roadMasterRepository, WindLocationRepository windLocationRepository
-            , WindLocationDataRepository windLocationDataRepository, WindForecastRepository windForecastRepository, WindForecastDataRepository windForecastDataRepository) {
+    public WindService(WindRepository windRepository, RoadMasterRepository roadMasterRepository, WindLocationRepository windLocationRepository
+            , WindForecastRepository windForecastRepository, WindForecastDataRepository windForecastDataRepository) {
         this.windRepository = windRepository;
-        this.roadPointRepository = roadPointRepository;
         this.roadMasterRepository = roadMasterRepository;
         this.windLocationRepository = windLocationRepository;
-        this.windLocationDataRepository = windLocationDataRepository;
         this.windForecastRepository = windForecastRepository;
         this.windForecastDataRepository = windForecastDataRepository;
     }
 
     @Transactional(readOnly = true)
-    public List<WindLocationData> findAllWindLocationData() {
-        return windLocationDataRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public List<WindLocationData> findAllWindLocationDataDistance(String latitude, String longitude) {
-        return windLocationDataRepository.findAllWindLocationDataDistance(latitude, longitude);
-    }
-
-    @Transactional(readOnly = true)
     public List<WindForecastData> findAllWindForecastDataDistance(String latitude, String longitude) {
         return windForecastDataRepository.findAllWindForecastDataDistance(latitude, longitude);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Wind> findAllByBaseDateAndBaseTime(String baseDate, String baseTime) {
-        return windRepository.findAllByBaseDateAndBaseTime(baseDate, baseTime);
-    }
-
-    @Transactional(readOnly = true)
-    public Wind findByWindData(String baseDate, String baseTime, String nx, String ny) {
-        return windRepository.findByBaseDateAndBaseTimeAndNxAndNy(baseDate, baseTime, nx, ny);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Wind> findAll() {
-        return windRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public List<RoadPoint> findAllRoadPoint() {
-        return roadPointRepository.findAllByRequestYnOrderByNxAscNyAsc("Y");
-    }
-
-    @Transactional(readOnly = true)
-    public List<RoadPoint> findByRoadPointList(String code) {
-        return roadPointRepository.findByRoad(code);
     }
 
     @Transactional(readOnly = true)

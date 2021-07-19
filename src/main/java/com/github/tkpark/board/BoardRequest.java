@@ -7,19 +7,19 @@ import javax.validation.constraints.NotBlank;
 
 public class BoardRequest {
 
-    @NotBlank(message = "boardTp must be provided")
+    @NotBlank(message = "피드백 종류를 선택해주세요.")
     private String boardTp;
 
-    @NotBlank(message = "name must be provided")
+    @NotBlank(message = "이름을 입력해주세요.")
     private String name;
 
-    //@NotBlank(message = "phone must be provided")
+    //@NotBlank(message = "휴대폰을 입력해주세요.")
     private String phone;
 
-    @NotBlank(message = "email must be provided")
+    @NotBlank(message = "연락처를 입력해주세요.")
     private String email;
 
-    @NotBlank(message = "content must be provided")
+    @NotBlank(message = "내용을 입력해주세요.")
     private String content;
 
     protected BoardRequest() {/*empty*/}
