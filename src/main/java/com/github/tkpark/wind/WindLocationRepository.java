@@ -22,4 +22,12 @@ public interface WindLocationRepository extends Repository<WindLocation, Long> {
     @Cacheable({"wind_location"})
     List<WindLocationInterface> findAllGroupBy();
 
+    @Query(value = "SELECT NX, NY " +
+            "  FROM wind_all_location " +
+            " WHERE loc_group = :locGroup " +
+            "   AND display = 'Y'" +
+            " GROUP BY NX, NY ", nativeQuery = true)
+    @Cacheable({"wind_all_location"})
+    List<WindLocationInterface> findAllLocGroupBy(String locGroup);
+
 }

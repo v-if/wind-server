@@ -12,7 +12,8 @@ spring:
     initial-size: 2
     hikari:
       minimum-idle: 2
-      maximum-pool-size: 5
+      maximum-pool-size: 10
+      max-lifetime: 30000
 db-server:
   db-url: "127.0.0.1:3306"
   db-username: ""

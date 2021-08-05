@@ -39,7 +39,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.github.tkpark" level="debug" additivity="false">
+    <logger name="com.github.tkpark" level="info" additivity="false">
         <appender-ref ref="file" />
         <appender-ref ref="errfile" />
     </logger>

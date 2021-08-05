@@ -26,7 +26,7 @@ public class CommonService {
     public static final int TRANSACTION_TIMEOUT = 5;
 
     // 요청 : 연결 타임아웃 (밀리초단위)
-    public static final int REQUEST_CONNECT_TIMEOUT = 3000;
+    public static final int REQUEST_CONNECT_TIMEOUT = 1000;
 
     // 요청 : 조회 타임아웃 (밀리초단위)
     public static final int REQUEST_READ_TIMEOUT = 5000;

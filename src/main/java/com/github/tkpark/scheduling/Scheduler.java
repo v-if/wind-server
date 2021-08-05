@@ -69,7 +69,23 @@ public class Scheduler {
         String time = "";
         String hour = hourFormat.format(now);
         String minute = minuteFormat.format(now);
-        log.info("now.date:{}, now.hour:{}, now.minute:{}", date, hour, minute);
+        String locGroup = "";
+
+        if(minute.equals("05")) {
+            locGroup = "A";
+        } else if(minute.equals("15")) {
+            locGroup = "B";
+        } else if(minute.equals("25")) {
+            locGroup = "C";
+        } else if(minute.equals("35")) {
+            locGroup = "D";
+        } else if(minute.equals("45")) {
+            locGroup = "E";
+        } else if(minute.equals("55")) {
+            locGroup = "F";
+        }
+
+        log.info("now.date:{}, now.hour:{}, now.minute:{}, locGroup:{}", date, hour, minute, locGroup);
 
         int h = Integer.parseInt(hour);
         int m = Integer.parseInt(minute);
@@ -86,6 +102,6 @@ public class Scheduler {
         }
 
         time = String.format("%02d", h) + "00";
-        windService.windForecast(date, time);
+        windService.windAllForecast(date, time, locGroup);
     }
 }
