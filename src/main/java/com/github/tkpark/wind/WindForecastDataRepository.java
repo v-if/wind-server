@@ -49,7 +49,7 @@ public interface WindForecastDataRepository extends Repository<WindForecastData,
             "                                 * COS(RADIANS(longitude - :longitude)) " +
             "                                 + SIN(RADIANS(latitude)) " +
             "                                 * SIN(RADIANS(:latitude)), 1.0))) * 1000, 0) AS distance " +
-            "                            FROM wind_location " +
+            "                            FROM wind_all_location " +
             "                           WHERE display = 'Y' " +
             "                          HAVING TRUNCATE(111.111 * " +
             "                                 DEGREES(ACOS(LEAST(COS(RADIANS(latitude)) " +
@@ -111,7 +111,7 @@ public interface WindForecastDataRepository extends Repository<WindForecastData,
             "                                 * COS(RADIANS(longitude - :longitude)) " +
             "                                 + SIN(RADIANS(latitude)) " +
             "                                 * SIN(RADIANS(:latitude)), 1.0))) * 1000, 0) AS distance " +
-            "                            FROM wind_location " +
+            "                            FROM wind_all_location " +
             "                           WHERE display = 'Y' " +
             "                          HAVING TRUNCATE(111.111 * " +
             "                                 DEGREES(ACOS(LEAST(COS(RADIANS(latitude)) " +

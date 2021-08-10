@@ -15,7 +15,7 @@ jwt:
     expiry-seconds: 600
 data-api:
   service-key: ""
-  ultra-srt-ncst: "http://apis.data.go.kr/1360000/VilageFcstInfoService/getUltraSrtNcst"
-  ultra-srt-fcst: "http://apis.data.go.kr/1360000/VilageFcstInfoService/getUltraSrtFcst"
-  vilage-fcst: "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst"
-  fcst-version: "http://apis.data.go.kr/1360000/VilageFcstInfoService/getFcstVersion"
+  ultra-srt-ncst: "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst"
+  ultra-srt-fcst: "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst"
+  vilage-fcst: "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst"
+  fcst-version: "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getFcstVersion"

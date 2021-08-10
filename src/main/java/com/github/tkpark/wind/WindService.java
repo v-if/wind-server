@@ -19,8 +19,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -224,12 +223,12 @@ public class WindService {
         int reqTotalCnt = windLocationList.size();
         int reqCnt = 0;
 
+        List<String> errLocationList = new ArrayList<String>();
+
         Connection con = null;
         PreparedStatement pstmt = null;
 
         try {
-            int resultCnt = 0;
-
             DBUtil dbUtil = new DBUtil(dbDataSource);
             con = dbUtil.getCon();
 
@@ -257,12 +256,14 @@ public class WindService {
                             .queryParam("ny", windLocation.getNy())
                             .build();
 
+                    long start = System.currentTimeMillis();
                     resEntity = commonService.request(builder.toUri(), HttpMethod.GET, reqEntity, new ParameterizedTypeReference<String>() {});
+                    long end = System.currentTimeMillis();
                     //log.info("res:{}", resEntity.getBody());
 
                     XmlMapper mapper = new XmlMapper();
                     UltraSrtFcst.Response res = mapper.readValue(resEntity.getBody(), UltraSrtFcst.Response.class);
-                    log.info("[{}/{}]resultCode:{}, resultMsg:{}, totalCount:{}", reqCnt, reqTotalCnt, res.getHeader().getResultCode(), res.getHeader().getResultMsg(), res.getBody().getTotalCount());
+                    log.info("[{}/{}]resultCode:{}, resultMsg:{}, totalCnt:{}, resTime:{} millis", reqCnt, reqTotalCnt, res.getHeader().getResultCode(), res.getHeader().getResultMsg(), res.getBody().getTotalCount(), (end-start));
 
                     int fcstCnt = res.getBody().getTotalCount() / 10;
 
@@ -286,73 +287,84 @@ public class WindService {
                                 String forecastTime = item.getFcstDate() + item.getFcstTime();
 
                                 forecastArr[num] = new WindForecast(baseDate, baseTime, nx, ny, forecastTime, "bacth");
-
-                                pstmt.setString(1, item.getBaseDate());
-                                pstmt.setString(2, item.getBaseTime());
-                                pstmt.setString(3, String.valueOf(item.getNx()));
-                                pstmt.setString(4, String.valueOf(item.getNy()));
-                                pstmt.setString(5, item.getFcstDate() + item.getFcstTime());
-                                pstmt.setString(17, "batch");
                             }
 
                             switch(item.getCategory()) {
                                 case "LGT":
-                                    //forecastArr[num].setLgt(item.getFcstValue());
-                                    pstmt.setString(6, item.getFcstValue());
+                                    forecastArr[num].setLgt(item.getFcstValue());
                                     break;
                                 case "PTY":
-                                    //forecastArr[num].setPty(item.getFcstValue());
-                                    pstmt.setString(7, item.getFcstValue());
+                                    forecastArr[num].setPty(item.getFcstValue());
                                     break;
                                 case "RN1":
-                                    //forecastArr[num].setRn1(item.getFcstValue());
-                                    pstmt.setString(8, item.getFcstValue());
+                                    forecastArr[num].setRn1(item.getFcstValue());
                                     break;
                                 case "SKY":
-                                    //forecastArr[num].setSky(item.getFcstValue());
-                                    pstmt.setString(9, item.getFcstValue());
+                                    forecastArr[num].setSky(item.getFcstValue());
                                     break;
                                 case "T1H":
-                                    //forecastArr[num].setT1h(item.getFcstValue());
-                                    pstmt.setString(10, item.getFcstValue());
+                                    forecastArr[num].setT1h(item.getFcstValue());
                                     break;
                                 case "REH":
-                                    //forecastArr[num].setReh(item.getFcstValue());
-                                    pstmt.setString(11, item.getFcstValue());
+                                    forecastArr[num].setReh(item.getFcstValue());
                                     break;
                                 case "UUU":
-                                    //forecastArr[num].setUuu(item.getFcstValue());
-                                    pstmt.setString(12, item.getFcstValue());
+                                    forecastArr[num].setUuu(item.getFcstValue());
                                     break;
                                 case "VVV":
-                                    //forecastArr[num].setVvv(item.getFcstValue());
-                                    pstmt.setString(13, item.getFcstValue());
+                                    forecastArr[num].setVvv(item.getFcstValue());
                                     break;
                                 case "VEC":
-                                    //forecastArr[num].setVec(item.getFcstValue());
-                                    //forecastArr[num].setWd16(calcWindDirection16(item.getFcstValue()));
-                                    pstmt.setString(14, item.getFcstValue());
-                                    pstmt.setString(16, item.getFcstValue());
+                                    forecastArr[num].setVec(item.getFcstValue());
+                                    forecastArr[num].setWd16(calcWindDirection16(item.getFcstValue()));
                                     break;
                                 case "WSD":
-                                    //forecastArr[num].setWsd(item.getFcstValue());
-                                    pstmt.setString(15, item.getFcstValue());
+                                    forecastArr[num].setWsd(item.getFcstValue());
                                     break;
                             }
                         }
-                        pstmt.addBatch();
-                        pstmt.clearParameters();
+                        for(int i=0; i<forecastArr.length; i++) {
+                            //windForecastRepository.save(forecastArr[i]);
+                            //`base_date`, `base_time`, `nx`, `ny`, `forecast_time`, `lgt`, `pty`, `rn1`, `sky`, `t1h`, `reh`, `uuu`, `vvv`, `vec`, `wsd`, `wd16`, `create`, `create_date`
+
+                            pstmt.setString(1, forecastArr[i].getBaseDate());
+                            pstmt.setString(2, forecastArr[i].getBaseTime());
+                            pstmt.setString(3, forecastArr[i].getNx());
+                            pstmt.setString(4, forecastArr[i].getNy());
+                            pstmt.setString(5, forecastArr[i].getForecastTime());
+                            pstmt.setString(6, forecastArr[i].getLgt());
+                            pstmt.setString(7, forecastArr[i].getPty());
+                            pstmt.setString(8, forecastArr[i].getRn1());
+                            pstmt.setString(9, forecastArr[i].getSky());
+                            pstmt.setString(10, forecastArr[i].getT1h());
+                            pstmt.setString(11, forecastArr[i].getReh());
+                            pstmt.setString(12, forecastArr[i].getUuu());
+                            pstmt.setString(13, forecastArr[i].getVvv());
+                            pstmt.setString(14, forecastArr[i].getVec());
+                            pstmt.setString(15, forecastArr[i].getWsd());
+                            pstmt.setString(16, forecastArr[i].getWd16());
+                            pstmt.setString(17, "batch");
+
+                            pstmt.addBatch();
+                            pstmt.clearParameters();
+                        }
                     }
+                    Thread.sleep(100);
                 } catch(Exception e) {
                     log.error("Request API Error nx:{}, ny:{}", windLocation.getNx(), windLocation.getNy());
                     log.error("e:{}", e);
+                    errLocationList.add("nx:" + windLocation.getNx() + ", ny:" +  windLocation.getNy());
                 }
             }
-            log.info("Reqeust End!!!");
 
-            int[] r = pstmt.executeBatch();
-            con.commit();
-            log.info("pstmt.executeBatch Success r.length:{}", r.length);
+            for(String txt : errLocationList) {
+                log.info(txt);
+            }
+            log.info("Reqeust Result... locGroup:{}, reqTotalCnt:{}, errCnt:{}", locGroup, reqTotalCnt, errLocationList.size());
+
+            //int[] r = pstmt.executeBatch();
+            //con.commit();
+            //log.info("pstmt.executeBatch Success r.length:{}", r.length);
         } catch(Exception e) {
             log.error("execute BAtch error e:{}", e);
         } finally {

@@ -29,7 +29,7 @@ public class CommonService {
     public static final int REQUEST_CONNECT_TIMEOUT = 1000;
 
     // 요청 : 조회 타임아웃 (밀리초단위)
-    public static final int REQUEST_READ_TIMEOUT = 5000;
+    public static final int REQUEST_READ_TIMEOUT = 10 * 1000;
 
     public <T> ResponseEntity<T> request(URI url, HttpMethod method, HttpEntity<?> reqEntity, ParameterizedTypeReference<T> responseType) throws ResourceAccessException, HttpServerErrorException {
         RestTemplate restTemplate = getRestTemplate();
