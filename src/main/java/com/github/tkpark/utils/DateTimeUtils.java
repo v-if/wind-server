@@ -73,4 +73,16 @@ public class DateTimeUtils {
 
         return time;
     }
+
+    public static String getPreviousDay() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
+        Date today = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(today);
+        c.add(Calendar.DATE, -1);
+        Date preDay = c.getTime();
+
+        return sdf.format(preDay);
+    }
 }

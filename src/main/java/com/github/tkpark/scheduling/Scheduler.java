@@ -1,5 +1,6 @@
 package com.github.tkpark.scheduling;
 
+import com.github.tkpark.utils.DateTimeUtils;
 import com.github.tkpark.wind.WindService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,20 @@ public class Scheduler {
 
     @Autowired
     WindService windService;
+
+    /**
+     * 동네예보 초단기예보
+     */
+    @Scheduled(cron = "0 0 4 * * *") // 새벽 4시에 하루에 호출되어 데이터 삭제
+    public void windDeleteOldData() {
+        log.info("Scheduler.windDeleteOldData() ");
+
+        String baseDate = DateTimeUtils.getPreviousDay();
+        log.info("baseDate:{}", baseDate);
+
+        int resultCnt = windService.deleteOldData(baseDate);
+        log.info("deleteOldData resultCnt:{}", resultCnt);
+    }
 
     /**
      * 동네예보 초단기실황
