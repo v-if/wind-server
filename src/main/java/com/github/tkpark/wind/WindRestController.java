@@ -50,14 +50,19 @@ public class WindRestController {
         List<WindForecastData> result = new ArrayList<>();
 
         // Zoom Level 추가
-        // 기본 14
-        // Zoom Level이 13 이상이면 Marker 조회해서 표시
-        // 그 이하 Zoom Level은 처리하지 않음
+        // Zoom Level 14 이상인 경우 Zoom = 'C'
+        // Zoom Level 12, 13 인 경우 Zoom = 'B'
+        // Zoom Level 7, 8, 9, 10, 11 인 경우 Zoom = 'A'
+        // 그외에는 화면에 마커 보여주지 않음
         int level = Integer.parseInt(zoomlevel);
-        if(level >= 13) {
+        if(level >= 14) {
             result = windService.findAllWindForecastDataDistance(latitude, longitude);
+        } else if(level >= 12) {
+            result = windService.findAllWindForecastDataDistanceZoom(latitude, longitude, "B");
+        } else if(level >= 7) {
+            result = windService.findAllWindForecastDataDistanceZoom(latitude, longitude, "A");
         } else {
-            result = windService.findAllWindForecastDataDistanceZoom("", "", 0);
+            result = windService.findAllWindForecastDataDistanceZoom("", "", "");
         }
 
         return success(result.stream()

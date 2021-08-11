@@ -72,8 +72,12 @@ public class WindService {
     }
 
     @Transactional(readOnly = true)
-    public List<WindForecastData> findAllWindForecastDataDistanceZoom(String latitude, String longitude, int distance) {
-        return windForecastDataRepository.findAllWindForecastDataDistanceZoom(latitude, longitude, distance);
+    public List<WindForecastData> findAllWindForecastDataDistanceZoom(String latitude, String longitude, String zoom) {
+        if(zoom.equals("B")) {
+            return windForecastDataRepository.findAllWindForecastDataDistanceZoomB(latitude, longitude, zoom);
+        } else {
+            return windForecastDataRepository.findAllWindForecastDataDistanceZoomA(latitude, longitude, zoom);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -217,7 +221,7 @@ public class WindService {
     public String windAllForecast(String date, String time, String locGroup) {
         log.info("WindService.windAllForecast(), date:{}, time:{}, locGroup:{}", date, time, locGroup);
 
-        List<WindLocationInterface> windLocationList = windLocationRepository.findAllLocGroupBy(locGroup);
+        List<WindLocationInterface> windLocationList = windLocationRepository.findLocGroupBy(locGroup);
         log.info("windLocationList.size():{}", windLocationList.size());
 
         int reqTotalCnt = windLocationList.size();
@@ -353,7 +357,7 @@ public class WindService {
                 } catch(Exception e) {
                     log.error("Request API Error nx:{}, ny:{}", windLocation.getNx(), windLocation.getNy());
                     log.error("e:{}", e);
-                    errLocationList.add("nx:" + windLocation.getNx() + ", ny:" +  windLocation.getNy());
+                    errLocationList.add("Request Error... nx:" + windLocation.getNx() + ", ny:" +  windLocation.getNy());
                 }
             }
 
@@ -362,9 +366,9 @@ public class WindService {
             }
             log.info("Reqeust Result... locGroup:{}, reqTotalCnt:{}, errCnt:{}", locGroup, reqTotalCnt, errLocationList.size());
 
-            //int[] r = pstmt.executeBatch();
-            //con.commit();
-            //log.info("pstmt.executeBatch Success r.length:{}", r.length);
+            int[] r = pstmt.executeBatch();
+            con.commit();
+            log.info("pstmt.executeBatch Success r.length:{}", r.length);
         } catch(Exception e) {
             log.error("execute BAtch error e:{}", e);
         } finally {

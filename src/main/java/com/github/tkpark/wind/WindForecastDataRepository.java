@@ -49,8 +49,9 @@ public interface WindForecastDataRepository extends Repository<WindForecastData,
             "                                 * COS(RADIANS(longitude - :longitude)) " +
             "                                 + SIN(RADIANS(latitude)) " +
             "                                 * SIN(RADIANS(:latitude)), 1.0))) * 1000, 0) AS distance " +
-            "                            FROM wind_all_location " +
+            "                            FROM wind_location " +
             "                           WHERE display = 'Y' " +
+            "                             AND zoom = 'C' " +
             "                          HAVING TRUNCATE(111.111 * " +
             "                                 DEGREES(ACOS(LEAST(COS(RADIANS(latitude)) " +
             "                                 * COS(RADIANS(:latitude)) " +
@@ -104,21 +105,22 @@ public interface WindForecastDataRepository extends Repository<WindForecastData,
             "          FROM ( " +
             "                 SELECT a.id, a.location1, a.location2, a.location3, a.nx, a.ny, a.latitude, a.longitude, a.distance " +
             "                   FROM ( " +
-            "                          SELECT id, location1, location2, location3, nx, ny, latitude, longitude " +
+            "                          SELECT id, location1, location2, location2 as 'location3', nx, ny, latitude, longitude " +
             "                               , TRUNCATE(111.111 * " +
             "                                 DEGREES(ACOS(LEAST(COS(RADIANS(latitude)) " +
             "                                 * COS(RADIANS(:latitude)) " +
             "                                 * COS(RADIANS(longitude - :longitude)) " +
             "                                 + SIN(RADIANS(latitude)) " +
             "                                 * SIN(RADIANS(:latitude)), 1.0))) * 1000, 0) AS distance " +
-            "                            FROM wind_all_location " +
-            "                           WHERE display = 'Y' " +
+            "                            FROM wind_location " +
+            "                           WHERE display = 'Y'" +
+            "                             AND zoom = :zoom " +
             "                          HAVING TRUNCATE(111.111 * " +
             "                                 DEGREES(ACOS(LEAST(COS(RADIANS(latitude)) " +
             "                                 * COS(RADIANS(:latitude)) " +
             "                                 * COS(RADIANS(longitude - :longitude)) " +
             "                                 + SIN(RADIANS(latitude)) " +
-            "                                 * SIN(RADIANS(:latitude)), 1.0))) * 1000, 0) <= :distance " +
+            "                                 * SIN(RADIANS(:latitude)), 1.0))) * 1000, 0) <= 10000 " +
             "                        ORDER BY RAND() " +
             "                           LIMIT 10 " +
             "                        ) a " +
@@ -132,7 +134,64 @@ public interface WindForecastDataRepository extends Repository<WindForecastData,
             "           AND wl.ny = wd.ny " +
             "       ) WL INNER JOIN wind_forecast WD ON WL.base_date = WD.base_date AND WL.base_time = WD.base_time AND WL.nx = WD.nx AND WL.ny = WD.ny " +
             " ORDER BY WL.distance, WD.forecast_time ", nativeQuery = true)
-    @Cacheable({"wind_forecast_data_distance_zoom"})
-    List<WindForecastData> findAllWindForecastDataDistanceZoom(String latitude, String longitude, int distance);
+    @Cacheable({"wind_forecast_data_distance_zoom_b"})
+    List<WindForecastData> findAllWindForecastDataDistanceZoomB(String latitude, String longitude, String zoom);
+
+    @Query(value = " SELECT WL.id " +
+            "     , WL.location1 " +
+            "     , WL.location2 " +
+            "     , WL.location3 " +
+            "     , WD.base_date " +
+            "     , WD.base_time " +
+            "     , WL.nx " +
+            "     , WL.ny " +
+            "     , WD.forecast_time " +
+            "     , WL.latitude " +
+            "     , WL.longitude " +
+            "     , WL.distance " +
+            "     , WD.lgt " +
+            "     , WD.pty " +
+            "     , WD.rn1 " +
+            "     , WD.sky " +
+            "     , WD.t1h " +
+            "     , WD.reh " +
+            "     , WD.uuu " +
+            "     , WD.vvv " +
+            "     , WD.vec " +
+            "     , WD.wsd " +
+            "     , WD.wd16 " +
+            "     , DATE_FORMAT(WD.create_date, '%Y-%m-%d %H:%i:%s') AS 'create_date' " +
+            "  FROM ( " +
+            "         SELECT substr(wd.datetime, 1, 8) AS 'base_date' " +
+            "              , substr(wd.datetime, 9, 12) AS 'base_time' " +
+            "              , wl.nx, wl.ny, wl.id, wl.location1, wl.location2, wl.location3, wl.latitude, wl.longitude, wl.distance " +
+            "          FROM ( " +
+            "                 SELECT a.id, a.location1, a.location1 as 'location2', a.location1 as 'location3', a.nx, a.ny, a.latitude, a.longitude, a.distance " +
+            "                   FROM ( " +
+            "                          SELECT id, location1, location2, location3, nx, ny, latitude, longitude " +
+            "                               , TRUNCATE(111.111 * " +
+            "                                 DEGREES(ACOS(LEAST(COS(RADIANS(latitude)) " +
+            "                                 * COS(RADIANS(:latitude)) " +
+            "                                 * COS(RADIANS(longitude - :longitude)) " +
+            "                                 + SIN(RADIANS(latitude)) " +
+            "                                 * SIN(RADIANS(:latitude)), 1.0))) * 1000, 0) AS distance " +
+            "                            FROM wind_location " +
+            "                           WHERE display = 'Y'" +
+            "                             AND zoom = :zoom " +
+            "                        ORDER BY RAND() " +
+            "                           LIMIT 10 " +
+            "                        ) a " +
+            "               ) wl " +
+            "             , ( " +
+            "                 SELECT MAX(concat(base_date, base_time)) AS 'datetime', nx, ny " +
+            "                   FROM wind_forecast " +
+            "                  GROUP BY nx, ny " +
+            "               ) wd " +
+            "         WHERE wl.nx = wd.nx " +
+            "           AND wl.ny = wd.ny " +
+            "       ) WL INNER JOIN wind_forecast WD ON WL.base_date = WD.base_date AND WL.base_time = WD.base_time AND WL.nx = WD.nx AND WL.ny = WD.ny " +
+            " ORDER BY WL.distance, WD.forecast_time ", nativeQuery = true)
+    @Cacheable({"wind_forecast_data_distance_zoom_a"})
+    List<WindForecastData> findAllWindForecastDataDistanceZoomA(String latitude, String longitude, String zoom);
 
 }
